@@ -12,7 +12,9 @@ public class WinningRule {
 
     public Outcome apply(Hand playerHand, Hand dealerHand) {
         Outcome outcome;
-        if (playerHand.getScore() > dealerHand.getScore()) {
+        if (playerHand.getScore() > CardConstants.PLAYER_HIGHEST_SCORE.getValue()) {
+            outcome = Outcome.LOOSE;
+        } else if (playerHand.getScore() > dealerHand.getScore() || dealerHand.getScore() > CardConstants.PLAYER_HIGHEST_SCORE.getValue()) {
             outcome = Outcome.WIN;
         } else if (dealerHand.getScore() > playerHand.getScore()) {
             outcome = Outcome.LOOSE;
