@@ -10,20 +10,17 @@ import java.util.stream.Collectors;
 
 public class RoundSimulator {
 
-    private Deck deck;
-    private Set<Card> usedCards;
+
     private RewardProcessor rewardProcessor;
     private WinningRule winningRule;
     private int roundNum;
 
-    public RoundSimulator(int roundNum) {
-        this.deck = new Deck();
-        deck.shuffle();
-        usedCards = new HashSet<>();
+    private DeckManager deckManager;
+    public RoundSimulator(DeckManager deckManager, int roundNum) {
+        this.deckManager = deckManager;
         rewardProcessor = new RewardProcessor();
         winningRule = new WinningRule();
         this.roundNum = roundNum;
-
     }
 
     public void playRound(List<Player> players, Player dealer) {
@@ -41,13 +38,13 @@ public class RoundSimulator {
         for (Player player : players) {
             Hand hand = playerHand.get(player);
             while (player.getActionStrategy().suggest(hand.getScore()).equals(Action.HIT)) {
-                hand.addCard(dealACard());
+                hand.addCard(deckManager.dealACard());
             }
         }
         Hand dealerHand = playerHand.get(dealer);
 
         while (dealer.getActionStrategy().suggest(dealerHand.getScore()).equals(Action.HIT)) {
-            dealerHand.addCard(dealACard());
+            dealerHand.addCard(deckManager.dealACard());
         }
 
         players.forEach(player -> {
@@ -56,7 +53,7 @@ public class RoundSimulator {
         });
 
         System.out.println("\nDealer state " + dealer + " , " + playerHand.get(dealer).getCards());
-        usedCards.addAll(playerHand.get(dealer).getCards());
+        deckManager.addUsedCard(playerHand.get(dealer).getCards());
         playerHand.remove(dealer);
 
         System.out.println("======================= Round " + roundNum + " Finished.=====================================");
@@ -65,20 +62,13 @@ public class RoundSimulator {
     private void dealFirst2Cards(List<Player> players, Player dealer, Map<Player, Hand> playerHand) {
         for (int i = 0; i < CardConstants.ROUND_INITIAL_DEAL_COUNT.getValue(); i++) {
             for (Player player : players) {
-                playerHand.get(player).addCard(dealACard());
+                playerHand.get(player).addCard(deckManager.dealACard());
             }
-            playerHand.get(dealer).addCard(dealACard());
+            playerHand.get(dealer).addCard(deckManager.dealACard());
         }
     }
 
-    private Card dealACard() {
-        if (deck.isEmpty()) {
-            deck = new Deck(usedCards);
-            deck.shuffle();
-            usedCards.clear();
-        }
-        return deck.popACard();
-    }
+
 
     private List<Player> checkProcessBlackJack(List<Player> players, Player dealer, Map<Player, Hand> playerHand) {
         boolean dealerBJ = playerHand.get(dealer).isBlackJack();
@@ -102,7 +92,7 @@ public class RoundSimulator {
         }
         System.out.println("\nRound " + roundNum + " : " + outcome + " : "+(winType.equals(WinType.BLACK_JACK)?" *BlackJack*":"") +"\n" + player + " "+playerHand.get(player) + " \n"
                 + dealer + playerHand.get(dealer));
-        usedCards.addAll(playerHand.get(player).getCards());
+        deckManager.addUsedCard(playerHand.get(player).getCards());
         playerHand.remove(player);
     }
 }

@@ -2,10 +2,7 @@ package com.vineet.model;
 
 import com.vineet.CardConstants;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Deck {
     private static final List<Card> singleDeckOfCards = getSingleDeckOfCards();
@@ -22,18 +19,6 @@ public class Deck {
         currentIndex = 0;
     }
 
-
-//    private void init() {
-//        int currentIndex = 0;
-//        Card[] temp_deck = new Card[Suite.values().length * (CardConstants.CARD_MAX_RANK.getValue() - CardConstants.CARD_MIN_RANK.getValue())];
-//        for (Suite suite : Suite.values()) {
-//            for (int i = CardConstants.CARD_MIN_RANK.getValue(); i <= CardConstants.CARD_MAX_RANK.getValue(); i++) {
-//                temp_deck[currentIndex] = new Card(suite, i);
-//            }
-//        }
-//        deck = temp_deck;
-//    }
-
     private static List<Card> getSingleDeckOfCards() {
         List<Card> singleDeck = new ArrayList<>(Suite.values().length * (CardConstants.CARD_MAX_RANK.getValue() - CardConstants.CARD_MIN_RANK.getValue()));
         for (Suite suite : Suite.values()) {
@@ -49,8 +34,7 @@ public class Deck {
     }
 
     public Card popACard() {
-        currentIndex++;
-        return deck.get(currentIndex);
+        return deck.get(currentIndex++);
     }
 
     public boolean isEmpty() {

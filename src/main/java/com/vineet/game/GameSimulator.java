@@ -15,6 +15,12 @@ import static com.vineet.CardConstants.PLAYER_BET_AMOUNT;
 import static com.vineet.CardConstants.PLAYER_MAX_INITIAL_AMOUNT;
 
 public class GameSimulator {
+    private DeckManager deckManager;
+
+    public GameSimulator(DeckManager deckManager) {
+        this.deckManager = deckManager;
+    }
+
     public void startGame(List<Player> players) {
         System.out.println(" received Start game request for " + players.size() + " players");
         validatePlayerCount(players);
@@ -22,10 +28,11 @@ public class GameSimulator {
         Player dealer = new Player(GameConstants.DEALER_NAME.getValue(), PlayerType.DEALER, 0, new ActionStrategy(CardConstants.DEALER_PLAYER_HIT_MAX.getValue()));
         List<Player> eligiblePlayers = getEligible(players);
 
+        deckManager.shuffleDeck();
         int roundNum = 1;
         while (!eligiblePlayers.isEmpty()) {
             System.out.println(" Initiating round " + roundNum + ", eligible player count " + eligiblePlayers.size());
-            RoundSimulator round = new RoundSimulator(roundNum);
+            RoundSimulator round = new RoundSimulator(deckManager, roundNum);
             round.playRound(eligiblePlayers, dealer);
             roundNum++;
             eligiblePlayers = getEligible(eligiblePlayers);
@@ -38,12 +45,12 @@ public class GameSimulator {
                     boolean eligible = true;
                     int balance = player.getWallet().getBalance();
                     if (balance < PLAYER_BET_AMOUNT.getValue()) {
-                        System.out.println("\n\n\t\t\t\t Player out, as low balance : " + player +"\n\n");
+                        System.out.println("\n\n\t\t\t\t Player out, as low balance : " + player + "\n\n");
                         eligible = false;
                     }
                     if ((balance - player.getWallet().getInitialMoney()) >= CardConstants.PLAYER_GAIN_LIMIT.getValue()) {
                         System.out.println("\n\n\t\t\t\t Player out, as Gain Amount limit reached : "
-                                + CardConstants.PLAYER_GAIN_LIMIT.getValue() + " player " + player+"\n\n");
+                                + CardConstants.PLAYER_GAIN_LIMIT.getValue() + " player " + player + "\n\n");
                         eligible = false;
                     }
                     return eligible;
@@ -70,8 +77,12 @@ public class GameSimulator {
     public static void main(String[] args) {
 
         System.out.println("hi user !!!");
-        if (args == null || args.length % 3 != 0) {
-            throw new IllegalArgumentException(" expected 3 arguments per player i.e " + (args.length / 3 + 1) + " but found " + args.length);
+        if (args == null || args.length == 0 || args.length % 3 != 0) {
+            String msg = " expected 3 arguments per player but found " + Arrays.toString(args) + "\n" +
+                    "sample command : \n java -jar blackjack.jar player1 20 c player2 30 a";
+
+            System.out.println(msg);
+            return;
         }
 
         System.out.println(" Received args " + Arrays.toString(args));
@@ -80,17 +91,17 @@ public class GameSimulator {
             String name = args[i];
             Integer initialMoney = Integer.valueOf(args[i + 1]);
             IActionStrategy actionStrategy;
-            String strategyStr = args[i+2];
-            if(strategyStr.equalsIgnoreCase("c")){
+            String strategyStr = args[i + 2];
+            if (strategyStr.equalsIgnoreCase("c")) {
                 actionStrategy = new ActionStrategy(CardConstants.CONSERVATIVE_PLAYER_HIT_MAX.getValue());
-            }else{
+            } else {
                 actionStrategy = new ActionStrategy(CardConstants.AGGRESSIVE_PLAYER_HIT_MAX.getValue());
             }
             Player p = new Player(name, PlayerType.PLAYER, initialMoney, actionStrategy);
             players.add(p);
-            i+=3;
+            i += 3;
         }
-        GameSimulator gs = new GameSimulator();
+        GameSimulator gs = new GameSimulator(new DeckManager());
         gs.startGame(players);
     }
 }
