@@ -79,7 +79,8 @@ public class GameSimulator {
         System.out.println("hi user !!!");
         if (args == null || args.length == 0 || args.length % 3 != 0) {
             String msg = " expected 3 arguments per player but found " + Arrays.toString(args) + "\n" +
-                    "sample command : \n java -jar blackjack.jar player1 20 c player2 30 a";
+                    "argument format <playername:String> <intialMoney:int> <policy aggresive or conservative :a/c>\n" +
+                    "sample command : \n java com.vineet.game.GameSimulator player1 20 c player2 30 a";
 
             System.out.println(msg);
             return;
