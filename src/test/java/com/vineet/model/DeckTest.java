@@ -14,12 +14,6 @@ import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeckTest {
-//
-//    @Mock
-//    private SendMoneyUseCase sendMoneyUseCase;
-
-//    @InjectMocks
-    private Deck deck;
 
     @Test
     public void testSuccess() {
@@ -28,7 +22,7 @@ public class DeckTest {
         cards.add(new Card(Suite.DIAMOND,2));
         cards.add(new Card(Suite.SPADE,11));
         cards.add(new Card(Suite.HEART,9));
-        deck = new Deck(cards);
+        Deck deck = new Deck(cards);
 
         System.out.println(Arrays.toString(cards.toArray()));
         Assert.assertEquals(cards.get(0),deck.popACard());
